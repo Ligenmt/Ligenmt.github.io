@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>python on Ligen的笔记</title>
+    <link>https://ligenmt.github.io/tags/python/</link>
+    <description>Recent content in python on Ligen的笔记</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© 2015 Copyright Text</copyright>
+    <lastBuildDate>Sun, 25 Oct 2015 08:36:54 -0700</lastBuildDate>
+    
+	<atom:link href="https://ligenmt.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Python操作Excel</title>
+      <link>https://ligenmt.github.io/post/python%E6%93%8D%E4%BD%9Cexcel/</link>
+      <pubDate>Sun, 25 Oct 2015 08:36:54 -0700</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/python%E6%93%8D%E4%BD%9Cexcel/</guid>
+      <description>import xlrd from xlutils.copy import copy import pymongo connect_url = &#39;mongodb://entry.ligen.net:20001/datacenter?authMechanism=SCRAM-SHA-1&#39; client = pymongo.MongoClient(connect_url).datacenter.initdata rexcel = xlrd.open_workbook(&#39;E:\\数据.xlsx&#39;) excel = copy(rexcel) table = rexcel.sheets()[1] ctable = excel.get_sheet(1) nrows = table.nrows for i in range(nrows): print(i, table.row_values(i)) if i == 0 or i == 1: continue row = table.row_values(i) customerId = str(int(row[1])) user = client.find_one({&#39;_id&#39;: customerId}) if not user: continue try: jingdong = user[&#39;customer&#39;][&#39;jingdongUP&#39;] email = user[&#39;customer&#39;][&#39;email&#39;] if jingdong: ctable.write(i, 6, jingdong) if email: ctable.</description>
+    </item>
+    
+  </channel>
+</rss>

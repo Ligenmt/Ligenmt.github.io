@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>Java发送邮件工具类</title>
+  <link href="https://ligenmt.github.io//css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="https://ligenmt.github.io//css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css">
+  <style type="text/css">
+  
+    footer.page-footer{background-image: url(https://ligenmt.github.io//images/default.png);}
+  
+  </style>
+</head>
+<body>
+  <ul id="slide-out" class="side-nav">
+    <li><a href="https://ligenmt.github.io/"><i class="mdi-action-home left"></i>Home<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+    <li><a href="https://ligenmt.github.io//categories"><i class="mdi-action-perm-media left"></i>Categories<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+    <li><a href="https://ligenmt.github.io//tags"><i class="mdi-action-loyalty left"></i>Tags<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+  </ul>
+  <div id="index-banner" class="parallax-container">
+  <a data-activates="slide-out" class="btn-floating button-collapse" style="top: 5px; left: 5px;"><i class="mdi-navigation-menu"></i></a>
+    <div class="section no-pad-bot">
+      <div class="container">
+        
+        <h1 class="header center teal-text text-lighten-2">Ligen的笔记</h1>
+        <div class="row center">
+          <h5 class="header col s12 light">一个小开发仔的笔记</h5>
+        </div>
+        <div class="row center">
+        
+        
+          <a href="https://github.com/ligenmt"><img src="https://ligenmt.github.io//images/github2-dreamstale35.png"></a>
+        
+        
+        
+        
+        
+          <a href="https://ligenmt.github.io//index.xml"><img src="https://ligenmt.github.io//images/feed-dreamstale27.png"></a>
+        </div>
+      </div>
+    </div>
+    <div class="parallax">
+    
+      <img src="https://ligenmt.github.io//images/default.png">
+    
+    </div>
+  </div>
+
+
+
+<div class="container">
+  <div class="section">
+
+    <div class="row">
+      <div class="col s12">
+        <div class="card-panel">
+          <h4>Java发送邮件工具类</h4>
+          <p>
+          
+            
+              <a href="https://ligenmt.github.io//categories/%E6%A8%A1%E6%9D%BF%E4%BB%A3%E7%A0%81/">模板代码</a>
+            
+           
+          </p>
+          <p>
+
+<h3 id="依赖">依赖</h3>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;javax.mail&lt;/groupId&gt;
+    &lt;artifactId&gt;mail&lt;/artifactId&gt;
+    &lt;version&gt;1.4.7&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<h3 id="模板代码">模板代码</h3>
+
+<pre><code class="language-java">/**
+ * Created by ligen on 2017/12/27.
+ */
+public class EmailUtil {
+
+    private static Logger logger = LoggerFactory.getLogger(EmailUtil.class);
+    static final String SSL_FACTORY = &quot;javax.net.ssl.SSLSocketFactory&quot;;
+
+    public static void init() {
+        Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+        props = new Properties();
+        props.put(&quot;mail.smtp.auth&quot;, &quot;true&quot;);
+        props.setProperty(&quot;mail.smtp.socketFactory.class&quot;, SSL_FACTORY);
+        props.setProperty(&quot;mail.smtp.socketFactory.fallback&quot;, &quot;false&quot;);
+        props.setProperty(&quot;mail.smtp.port&quot;, &quot;465&quot;);
+        props.setProperty(&quot;mail.smtp.socketFactory.port&quot;, &quot;465&quot;);
+        props.put(&quot;mail.smtp.host&quot;, &quot;smtp.exmail.qq.com&quot;);
+        // 发件人的账号
+        props.put(&quot;mail.user&quot;, &quot;xxx@xxx.net&quot;);
+        // 访问SMTP服务时需要提供的密码
+        props.put(&quot;mail.password&quot;, &quot;xxx&quot;);
+    }
+
+    public static void sendEmail(String title, String content, Collection&lt;String&gt; targetUsers, String contentType) {
+
+        if (title.length() &gt; 100) {
+            logger.info(&quot;标题过长！是不是写反了, {}&quot;, title);
+            throw new RuntimeException();
+        }
+        if (props == null) {
+            init();
+        }
+
+        Authenticator authenticator = new Authenticator() {
+            @Override
+            protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
+                String username = props.getProperty(&quot;mail.user&quot;);
+                String password = props.getProperty(&quot;mail.password&quot;);
+                return new javax.mail.PasswordAuthentication(username, password);
+            }
+        };
+        try {
+            // 使用环境属性和授权信息，创建邮件会话
+            Session mailSession = Session.getInstance(props, authenticator);
+            // 创建邮件消息
+            MimeMessage message = new MimeMessage(mailSession);
+            // 设置发件人
+            InternetAddress form = new InternetAddress(
+                    props.getProperty(&quot;mail.user&quot;));
+            message.setFrom(form);
+
+            // 设置收件人
+            InternetAddress[] to;
+            to = new InternetAddress[targetUsers.size()];
+            int i=0;
+            for (String target : targetUsers) {
+                to[i] = new InternetAddress(target);
+                i++;
+            }
+            message.setRecipients(Message.RecipientType.TO, to);
+            message.setSubject(title);
+            message.setContent(content, contentType);
+            Transport.send(message);
+        } catch (MessagingException e) {
+            logger.error(&quot;发送邮件失败..&quot; + title, e);
+        }
+        logger.info(&quot;邮件已发送：{}&quot;, title);
+
+    }
+
+    public static void sendEmail(String title, String content, String[] targetUsers) {
+
+        List&lt;String&gt; list = new ArrayList&lt;&gt;();
+        Collections.addAll(list, targetUsers);
+        sendEmail(title, content, list, &quot;text/plain;charset=UTF-8&quot;);
+    }
+
+    public static void sendEmail(String title, String content, String[] targetUsers, String contentType) {
+
+        List&lt;String&gt; list = new ArrayList&lt;&gt;();
+        Collections.addAll(list, targetUsers);
+        sendEmail(title, content, list, contentType);
+    }
+}
+
+</code></pre>
+</p>
+          <p>26 Apr 2019
+            
+              
+                <a href="https://ligenmt.github.io//tags/java/">#java</a>
+              
+            
+          </p>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col s3 m1">
+      
+        <a class="btn-floating btn-large waves-effect waves-light" href="https://ligenmt.github.io/post/dota%E5%B8%B8%E7%94%A8%E6%9C%AF%E8%AF%AD%E7%BF%BB%E8%AF%91/"><i class="mdi-navigation-arrow-back"></i></a>
+      
+      </div>
+      <div class="col s6 m10 center">&nbsp</div>
+      <div class="col s3 m1">
+      
+        <a class="btn-floating btn-large waves-effect waves-light" href="https://ligenmt.github.io/post/%E5%AD%A6%E4%B9%A0%E6%97%A5%E5%BF%97/"><i class="mdi-navigation-arrow-forward"></i></a>
+      
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  <footer class="page-footer">
+    <div class="footer-copyright">
+      <div class="container">
+      © 2015 Copyright Text
+      <div class="right">Design <a class="grey-text text-lighten-4" href="http://pdevty.github.io/blog/">pdevty</a></div>
+      </div>
+    </div>
+  </footer>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://ligenmt.github.io//js/materialize.min.js"></script>
+  <script src="https://ligenmt.github.io//js/init.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  </body>
+</html>
+

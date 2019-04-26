@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>Springboot配置Rabbitmq</title>
+  <link href="https://ligenmt.github.io//css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="https://ligenmt.github.io//css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css">
+  <style type="text/css">
+  
+    footer.page-footer{background-image: url(https://ligenmt.github.io//images/default.png);}
+  
+  </style>
+</head>
+<body>
+  <ul id="slide-out" class="side-nav">
+    <li><a href="https://ligenmt.github.io/"><i class="mdi-action-home left"></i>Home<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+    <li><a href="https://ligenmt.github.io//categories"><i class="mdi-action-perm-media left"></i>Categories<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+    <li><a href="https://ligenmt.github.io//tags"><i class="mdi-action-loyalty left"></i>Tags<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+  </ul>
+  <div id="index-banner" class="parallax-container">
+  <a data-activates="slide-out" class="btn-floating button-collapse" style="top: 5px; left: 5px;"><i class="mdi-navigation-menu"></i></a>
+    <div class="section no-pad-bot">
+      <div class="container">
+        
+        <h1 class="header center teal-text text-lighten-2">Ligen的笔记</h1>
+        <div class="row center">
+          <h5 class="header col s12 light">一个小开发仔的笔记</h5>
+        </div>
+        <div class="row center">
+        
+        
+          <a href="https://github.com/ligenmt"><img src="https://ligenmt.github.io//images/github2-dreamstale35.png"></a>
+        
+        
+        
+        
+        
+          <a href="https://ligenmt.github.io//index.xml"><img src="https://ligenmt.github.io//images/feed-dreamstale27.png"></a>
+        </div>
+      </div>
+    </div>
+    <div class="parallax">
+    
+      <img src="https://ligenmt.github.io//images/default.png">
+    
+    </div>
+  </div>
+
+
+
+<div class="container">
+  <div class="section">
+
+    <div class="row">
+      <div class="col s12">
+        <div class="card-panel">
+          <h4>Springboot配置Rabbitmq</h4>
+          <p>
+          
+            
+              <a href="https://ligenmt.github.io//categories/%E6%A8%A1%E6%9D%BF%E4%BB%A3%E7%A0%81/">模板代码</a>
+            
+           
+          </p>
+          <p>
+
+<h3 id="springboot-配置">Springboot 配置</h3>
+
+<pre><code>spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=guest
+spring.rabbitmq.virtual-host=/
+#消费者数量
+spring.rabbitmq.listener.simple.concurrency=10  
+spring.rabbitmq.listener.simple.max-concurrency=10
+#每次取几个
+spring.rabbitmq.listener.simple.prefetch=1
+spring.rabbitmq.listener.simple.auto-startup=true
+spring.rabbitmq.listener.simple.default-requeue-rejected=true
+spring.rabbitmq.template.retry.enabled=true
+spring.rabbitmq.template.retry.initial-interval=1000
+spring.rabbitmq.template.retry.max-attempts=3
+spring.rabbitmq.template.retry.max-interval=10000
+spring.rabbitmq.template.retry.multiplier=1
+</code></pre>
+
+<h3 id="配置类">配置类</h3>
+
+<pre><code>package com.ligen.javalab.rabbitmq;
+
+import org.springframework.amqp.core.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Configuration
+public class MQConfig {
+
+    public static final String QUEUE = &quot;queue&quot;;
+    public static final String TOPIC_QUEUE1 = &quot;topic.queue.1&quot;;
+    public static final String TOPIC_QUEUE2 = &quot;topic.queue.2&quot;;
+    public static final String FANOUT_QUEUE1 = &quot;fanout.queue.1&quot;;
+    public static final String FANOUT_QUEUE2 = &quot;fanout.queue.2&quot;;
+    public static final String HEADER_QUEUE1 = &quot;header.queue.2&quot;;
+    public static final String TOPIC_EXHANGE = &quot;topicExchange&quot;;
+    public static final String FANOUT_EXHANGE = &quot;fanoutExchange&quot;;
+    public static final String HEADERS_EXHANGE = &quot;headersExchange&quot;;
+    public static final String ROUTING_KEY1 = &quot;topic.key1&quot;;
+    public static final String ROUTING_KEY2 = &quot;topic.#&quot;;
+    /**
+     * Direct模式
+     * @return
+     */
+    @Bean
+    public Queue queue() {
+        return new Queue(QUEUE, true);
+    }
+
+    /**
+     * Topic模式
+     * @return
+     */
+    @Bean
+    public TopicExchange topicExchange() {
+        return new TopicExchange(TOPIC_EXHANGE);
+    }
+
+    @Bean
+    public Queue topicQueue1() {
+        return new Queue(TOPIC_QUEUE1, true);
+    }
+
+    @Bean
+    public Queue topicQueue2() {
+        return new Queue(TOPIC_QUEUE2, true);
+    }
+
+
+    @Bean
+    public Binding topicBinding1() {
+        //将queue绑定到交换机上
+        return BindingBuilder.bind(topicQueue1()).to(topicExchange()).with(ROUTING_KEY1);
+    }
+
+    @Bean
+    public Binding topicBinding2() {
+        //routingKey带通配符，可以由交换机发给多个queue
+        return BindingBuilder.bind(topicQueue2()).to(topicExchange()).with(ROUTING_KEY2);
+    }
+
+    /**
+     * Fanout模式
+      * @return
+     */
+    @Bean
+    public FanoutExchange fanoutExchange() {
+        return new FanoutExchange(FANOUT_EXHANGE);
+    }
+
+    @Bean
+    public Queue fanoutQueue1() {
+        return new Queue(FANOUT_QUEUE1, true);
+    }
+
+    @Bean
+    public Queue fanoutQueue2() {
+        return new Queue(FANOUT_QUEUE2, true);
+    }
+
+    @Bean
+    public Binding fanoutBinding1() {
+        //将queue绑定到交换机上
+        return BindingBuilder.bind(fanoutQueue1()).to(fanoutExchange());
+    }
+
+    @Bean
+    public Binding fanoutBinding2() {
+        return BindingBuilder.bind(fanoutQueue2()).to(fanoutExchange());
+    }
+
+    /**
+     * Header模式
+     * @return
+     */
+    @Bean
+    public HeadersExchange headerExchange() {
+        return new HeadersExchange(HEADERS_EXHANGE);
+    }
+
+    @Bean
+    public Queue headerQueue() {
+        return new Queue(HEADER_QUEUE1, true);
+    }
+
+    @Bean
+    public Binding headerBinding1() {
+        //Header模式
+        Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();
+        map.put(&quot;header1&quot;, &quot;value1&quot;);
+        map.put(&quot;header2&quot;, &quot;value2&quot;);
+        return BindingBuilder.bind(headerQueue()).to(headerExchange()).whereAll(map).match();
+    }
+}
+
+</code></pre>
+
+<h3 id="sender">Sender</h3>
+
+<pre><code>import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+@Slf4j
+public class MQSender {
+
+    @Autowired
+    AmqpTemplate amqpTemplate;
+
+    public void send(Object message) {
+        amqpTemplate.convertAndSend(MQConfig.QUEUE, JSON.toJSONString(message));
+        log.info(&quot;send message:{}&quot;, message);
+    }
+
+    public void sendTopic(Object message) {
+        //指定exchange, routingKey, message，先发到交换机，交换机根据routingKey找queue
+        amqpTemplate.convertAndSend(MQConfig.TOPIC_EXHANGE, MQConfig.ROUTING_KEY1, JSON.toJSONString(message));
+        amqpTemplate.convertAndSend(MQConfig.TOPIC_EXHANGE, &quot;topic.key2&quot;, JSON.toJSONString(message));
+        log.info(&quot;send message:{}&quot;, message);
+    }
+
+    public void sendFanout(Object message) {
+        //发送广播
+        amqpTemplate.convertAndSend(MQConfig.FANOUT_EXHANGE, &quot;&quot;, JSON.toJSONString(message));
+        log.info(&quot;send message:{}&quot;, message);
+    }
+
+    public void sendHeader(Object message) {
+        MessageProperties properties = new MessageProperties();
+        properties.setHeader(&quot;header1&quot;, &quot;value1&quot;);
+        properties.setHeader(&quot;header2&quot;, &quot;value2&quot;);
+        Message obj = new Message(message.toString().getBytes(), properties);
+        amqpTemplate.convertAndSend(MQConfig.HEADERS_EXHANGE, &quot;&quot;, obj);
+        log.info(&quot;send message:{}&quot;, message);
+    }
+}
+</code></pre>
+
+<h3 id="receiver">Receiver</h3>
+
+<pre><code>import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+@Component
+@Slf4j
+public class MQReceiver {
+
+    @RabbitListener(queues = MQConfig.QUEUE)
+    public void receive(String msg) {
+      log.info(&quot;receive message:{}&quot;, msg);
+    }
+
+    @RabbitListener(queues = MQConfig.TOPIC_QUEUE1)
+    public void receiveTopic1(String msg) {
+        log.info(&quot;receiveTopic1 message:{}&quot;, msg);
+    }
+
+    @RabbitListener(queues = MQConfig.TOPIC_QUEUE2)
+    public void receiveTopic2(String msg) {
+        log.info(&quot;receiveTopic2 message:{}&quot;, msg);
+    }
+
+    @RabbitListener(queues = MQConfig.FANOUT_QUEUE1)
+    public void receiveFanout1(String msg) {
+        log.info(&quot;receiveFanout1 message:{}&quot;, msg);
+    }
+
+    @RabbitListener(queues = MQConfig.FANOUT_QUEUE2)
+    public void receiveFanout2(String msg) {
+        log.info(&quot;receiveFanout2 message:{}&quot;, msg);
+    }
+
+    @RabbitListener(queues = MQConfig.HEADER_QUEUE1)
+    public void receiveHeader(byte[] msg) {
+        String str = new String(msg);
+        log.info(&quot;receiveHeader message:{}&quot;, str);
+    }
+}
+</code></pre>
+</p>
+          <p>25 Mar 2019
+            
+              
+                <a href="https://ligenmt.github.io//tags/java/">#java</a>
+              
+            
+          </p>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col s3 m1">
+      
+        <a class="btn-floating btn-large waves-effect waves-light" href="https://ligenmt.github.io/post/go%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%B1%82%E8%A7%A3%E8%BF%B7%E5%AE%AB/"><i class="mdi-navigation-arrow-back"></i></a>
+      
+      </div>
+      <div class="col s6 m10 center">&nbsp</div>
+      <div class="col s3 m1">
+      
+        <a class="btn-floating btn-large waves-effect waves-light" href="https://ligenmt.github.io/post/dota%E5%B8%B8%E7%94%A8%E6%9C%AF%E8%AF%AD%E7%BF%BB%E8%AF%91/"><i class="mdi-navigation-arrow-forward"></i></a>
+      
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  <footer class="page-footer">
+    <div class="footer-copyright">
+      <div class="container">
+      © 2015 Copyright Text
+      <div class="right">Design <a class="grey-text text-lighten-4" href="http://pdevty.github.io/blog/">pdevty</a></div>
+      </div>
+    </div>
+  </footer>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://ligenmt.github.io//js/materialize.min.js"></script>
+  <script src="https://ligenmt.github.io//js/init.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  </body>
+</html>
+

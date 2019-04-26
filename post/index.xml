@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Ligen的笔记</title>
+    <link>https://ligenmt.github.io/post/</link>
+    <description>Recent content in Posts on Ligen的笔记</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© 2015 Copyright Text</copyright>
+    <lastBuildDate>Fri, 26 Apr 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://ligenmt.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>2019-04学习日志</title>
+      <link>https://ligenmt.github.io/post/%E5%AD%A6%E4%B9%A0%E6%97%A5%E5%BF%97/</link>
+      <pubDate>Fri, 26 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/%E5%AD%A6%E4%B9%A0%E6%97%A5%E5%BF%97/</guid>
+      <description> 2019-04学习日志  大神帮忙安装了一个k8s单点供我把玩，读完了官网的交互教程和大部分示例，熟悉一下k8s的各种概念:pod，deployment，service等等，可以小吹一下。生产环境还没想好怎么使用。 由于学习k8s的缘故顺道看了iptables的用法和NAT（网络地址转换）。发现某些菜鸡都懂NAT而我却不懂，尴尬啊，吹逼被识破了。 由于某大厂源码泄露加快学习go，看了两个视频：Go语言实战流媒体视频网站，Google资深工程师深度讲解Go语言。第二个还是有点东西，包括一个广度优先算法和小爬虫架构。go主要的吹逼点在于chan吧，可以玩出花来。 研究mybatis源码，仿照着写了个简易的小框架。 研究zuul的源码，加了个router稍微改动了下，之后用不用还不确定。 分布式锁的redis各类实现和缺陷。 三种限流算法：计数器（实现很简单），漏桶，令牌桶（用google包很简单）。 把石油大典的词典考出来了，考虑要不要搭个翻译小网站。  </description>
+    </item>
+    
+    <item>
+      <title>Java发送邮件工具类</title>
+      <link>https://ligenmt.github.io/post/java%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E5%B7%A5%E5%85%B7%E7%B1%BB/</link>
+      <pubDate>Fri, 26 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/java%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E5%B7%A5%E5%85%B7%E7%B1%BB/</guid>
+      <description>依赖 &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;javax.mail&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;mail&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.4.7&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt;  模板代码 /** * Created by ligen on 2017/12/27. */ public class EmailUtil { private static Logger logger = LoggerFactory.getLogger(EmailUtil.class); static final String SSL_FACTORY = &amp;quot;javax.net.ssl.SSLSocketFactory&amp;quot;; public static void init() { Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider()); props = new Properties(); props.put(&amp;quot;mail.smtp.auth&amp;quot;, &amp;quot;true&amp;quot;); props.setProperty(&amp;quot;mail.smtp.socketFactory.class&amp;quot;, SSL_FACTORY); props.setProperty(&amp;quot;mail.smtp.socketFactory.fallback&amp;quot;, &amp;quot;false&amp;quot;); props.setProperty(&amp;quot;mail.smtp.port&amp;quot;, &amp;quot;465&amp;quot;); props.setProperty(&amp;quot;mail.smtp.socketFactory.port&amp;quot;, &amp;quot;465&amp;quot;); props.put(&amp;quot;mail.smtp.host&amp;quot;, &amp;quot;smtp.exmail.qq.com&amp;quot;); // 发件人的账号 props.put(&amp;quot;mail.user&amp;quot;, &amp;quot;xxx@xxx.net&amp;quot;); // 访问SMTP服务时需要提供的密码 props.put(&amp;quot;mail.password&amp;quot;, &amp;quot;xxx&amp;quot;); } public static void sendEmail(String title, String content, Collection&amp;lt;String&amp;gt; targetUsers, String contentType) { if (title.</description>
+    </item>
+    
+    <item>
+      <title>Dota常用术语翻译</title>
+      <link>https://ligenmt.github.io/post/dota%E5%B8%B8%E7%94%A8%E6%9C%AF%E8%AF%AD%E7%BF%BB%E8%AF%91/</link>
+      <pubDate>Tue, 26 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/dota%E5%B8%B8%E7%94%A8%E6%9C%AF%E8%AF%AD%E7%BF%BB%E8%AF%91/</guid>
+      <description>面伤&amp;rdquo;aoe&amp;rdquo; - area if effect; the radius of a certain area. 魔瓶&amp;rdquo;bottle&amp;rdquo; - to seal a rune into the item, Bottle. 素质 &amp;ldquo;bg&amp;rdquo; - bad game; game was not fun. If a player states bg in the middle of a game, they are either being sarcastic or gave up on the hopes of winning. 后期&amp;rdquo;carry&amp;rdquo; - A hero that has the capability of wiping out the enemy team and winning the game.</description>
+    </item>
+    
+    <item>
+      <title>Springboot配置Rabbitmq</title>
+      <link>https://ligenmt.github.io/post/springboot%E4%B8%ADrabbitmq%E5%9B%9B%E7%A7%8D%E4%BA%A4%E6%8D%A2%E6%9C%BA%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F/</link>
+      <pubDate>Mon, 25 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/springboot%E4%B8%ADrabbitmq%E5%9B%9B%E7%A7%8D%E4%BA%A4%E6%8D%A2%E6%9C%BA%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F/</guid>
+      <description>Springboot 配置 spring.rabbitmq.host=localhost spring.rabbitmq.port=5672 spring.rabbitmq.username=guest spring.rabbitmq.password=guest spring.rabbitmq.virtual-host=/ #消费者数量 spring.rabbitmq.listener.simple.concurrency=10 spring.rabbitmq.listener.simple.max-concurrency=10 #每次取几个 spring.rabbitmq.listener.simple.prefetch=1 spring.rabbitmq.listener.simple.auto-startup=true spring.rabbitmq.listener.simple.default-requeue-rejected=true spring.rabbitmq.template.retry.enabled=true spring.rabbitmq.template.retry.initial-interval=1000 spring.rabbitmq.template.retry.max-attempts=3 spring.rabbitmq.template.retry.max-interval=10000 spring.rabbitmq.template.retry.multiplier=1  配置类 package com.ligen.javalab.rabbitmq; import org.springframework.amqp.core.*; import org.springframework.context.annotation.Bean; import org.springframework.context.annotation.Configuration; import java.util.HashMap; import java.util.Map; @Configuration public class MQConfig { public static final String QUEUE = &amp;quot;queue&amp;quot;; public static final String TOPIC_QUEUE1 = &amp;quot;topic.queue.1&amp;quot;; public static final String TOPIC_QUEUE2 = &amp;quot;topic.queue.2&amp;quot;; public static final String FANOUT_QUEUE1 = &amp;quot;fanout.queue.1&amp;quot;; public static final String FANOUT_QUEUE2 = &amp;quot;fanout.</description>
+    </item>
+    
+    <item>
+      <title>go广度优先求解迷宫</title>
+      <link>https://ligenmt.github.io/post/go%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%B1%82%E8%A7%A3%E8%BF%B7%E5%AE%AB/</link>
+      <pubDate>Mon, 20 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/go%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%B1%82%E8%A7%A3%E8%BF%B7%E5%AE%AB/</guid>
+      <description>正在学习慕课网go语言视频，实现了一个广度优先的迷宫走法搜索。
+迷宫文件maze.in:
+其中第一行表示迷宫的行列数，1表示障碍，0表示可走。
+6 5 0 1 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0  以下是实现：
+package main import ( &amp;quot;fmt&amp;quot; &amp;quot;os&amp;quot; ) /** 广度优先走迷宫 */ func main() { maze := readMaze(&amp;quot;maze/maze.in&amp;quot;) for _, row := range maze { for _, val := range row { fmt.Printf(&amp;quot;%d &amp;quot;, val) } fmt.</description>
+    </item>
+    
+    <item>
+      <title>Python操作Excel</title>
+      <link>https://ligenmt.github.io/post/python%E6%93%8D%E4%BD%9Cexcel/</link>
+      <pubDate>Sun, 25 Oct 2015 08:36:54 -0700</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/python%E6%93%8D%E4%BD%9Cexcel/</guid>
+      <description>import xlrd from xlutils.copy import copy import pymongo connect_url = &#39;mongodb://entry.ligen.net:20001/datacenter?authMechanism=SCRAM-SHA-1&#39; client = pymongo.MongoClient(connect_url).datacenter.initdata rexcel = xlrd.open_workbook(&#39;E:\\数据.xlsx&#39;) excel = copy(rexcel) table = rexcel.sheets()[1] ctable = excel.get_sheet(1) nrows = table.nrows for i in range(nrows): print(i, table.row_values(i)) if i == 0 or i == 1: continue row = table.row_values(i) customerId = str(int(row[1])) user = client.find_one({&#39;_id&#39;: customerId}) if not user: continue try: jingdong = user[&#39;customer&#39;][&#39;jingdongUP&#39;] email = user[&#39;customer&#39;][&#39;email&#39;] if jingdong: ctable.write(i, 6, jingdong) if email: ctable.</description>
+    </item>
+    
+  </channel>
+</rss>

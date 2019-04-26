@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>编程心法 on Ligen的笔记</title>
+    <link>https://ligenmt.github.io/categories/%E7%BC%96%E7%A8%8B%E5%BF%83%E6%B3%95/</link>
+    <description>Recent content in 编程心法 on Ligen的笔记</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© 2015 Copyright Text</copyright>
+    <lastBuildDate>Mon, 20 Aug 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://ligenmt.github.io/categories/%E7%BC%96%E7%A8%8B%E5%BF%83%E6%B3%95/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>go广度优先求解迷宫</title>
+      <link>https://ligenmt.github.io/post/go%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%B1%82%E8%A7%A3%E8%BF%B7%E5%AE%AB/</link>
+      <pubDate>Mon, 20 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/go%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%B1%82%E8%A7%A3%E8%BF%B7%E5%AE%AB/</guid>
+      <description>正在学习慕课网go语言视频，实现了一个广度优先的迷宫走法搜索。
+迷宫文件maze.in:
+其中第一行表示迷宫的行列数，1表示障碍，0表示可走。
+6 5 0 1 0 0 0 0 0 0 1 0 0 1 0 1 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0  以下是实现：
+package main import ( &amp;quot;fmt&amp;quot; &amp;quot;os&amp;quot; ) /** 广度优先走迷宫 */ func main() { maze := readMaze(&amp;quot;maze/maze.in&amp;quot;) for _, row := range maze { for _, val := range row { fmt.Printf(&amp;quot;%d &amp;quot;, val) } fmt.</description>
+    </item>
+    
+  </channel>
+</rss>

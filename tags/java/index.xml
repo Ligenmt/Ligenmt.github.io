@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>java on Ligen的笔记</title>
+    <link>https://ligenmt.github.io/tags/java/</link>
+    <description>Recent content in java on Ligen的笔记</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© 2015 Copyright Text</copyright>
+    <lastBuildDate>Fri, 26 Apr 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://ligenmt.github.io/tags/java/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Java发送邮件工具类</title>
+      <link>https://ligenmt.github.io/post/java%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E5%B7%A5%E5%85%B7%E7%B1%BB/</link>
+      <pubDate>Fri, 26 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/java%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E5%B7%A5%E5%85%B7%E7%B1%BB/</guid>
+      <description>依赖 &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;javax.mail&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;mail&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.4.7&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt;  模板代码 /** * Created by ligen on 2017/12/27. */ public class EmailUtil { private static Logger logger = LoggerFactory.getLogger(EmailUtil.class); static final String SSL_FACTORY = &amp;quot;javax.net.ssl.SSLSocketFactory&amp;quot;; public static void init() { Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider()); props = new Properties(); props.put(&amp;quot;mail.smtp.auth&amp;quot;, &amp;quot;true&amp;quot;); props.setProperty(&amp;quot;mail.smtp.socketFactory.class&amp;quot;, SSL_FACTORY); props.setProperty(&amp;quot;mail.smtp.socketFactory.fallback&amp;quot;, &amp;quot;false&amp;quot;); props.setProperty(&amp;quot;mail.smtp.port&amp;quot;, &amp;quot;465&amp;quot;); props.setProperty(&amp;quot;mail.smtp.socketFactory.port&amp;quot;, &amp;quot;465&amp;quot;); props.put(&amp;quot;mail.smtp.host&amp;quot;, &amp;quot;smtp.exmail.qq.com&amp;quot;); // 发件人的账号 props.put(&amp;quot;mail.user&amp;quot;, &amp;quot;xxx@xxx.net&amp;quot;); // 访问SMTP服务时需要提供的密码 props.put(&amp;quot;mail.password&amp;quot;, &amp;quot;xxx&amp;quot;); } public static void sendEmail(String title, String content, Collection&amp;lt;String&amp;gt; targetUsers, String contentType) { if (title.</description>
+    </item>
+    
+    <item>
+      <title>Springboot配置Rabbitmq</title>
+      <link>https://ligenmt.github.io/post/springboot%E4%B8%ADrabbitmq%E5%9B%9B%E7%A7%8D%E4%BA%A4%E6%8D%A2%E6%9C%BA%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F/</link>
+      <pubDate>Mon, 25 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/springboot%E4%B8%ADrabbitmq%E5%9B%9B%E7%A7%8D%E4%BA%A4%E6%8D%A2%E6%9C%BA%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F/</guid>
+      <description>Springboot 配置 spring.rabbitmq.host=localhost spring.rabbitmq.port=5672 spring.rabbitmq.username=guest spring.rabbitmq.password=guest spring.rabbitmq.virtual-host=/ #消费者数量 spring.rabbitmq.listener.simple.concurrency=10 spring.rabbitmq.listener.simple.max-concurrency=10 #每次取几个 spring.rabbitmq.listener.simple.prefetch=1 spring.rabbitmq.listener.simple.auto-startup=true spring.rabbitmq.listener.simple.default-requeue-rejected=true spring.rabbitmq.template.retry.enabled=true spring.rabbitmq.template.retry.initial-interval=1000 spring.rabbitmq.template.retry.max-attempts=3 spring.rabbitmq.template.retry.max-interval=10000 spring.rabbitmq.template.retry.multiplier=1  配置类 package com.ligen.javalab.rabbitmq; import org.springframework.amqp.core.*; import org.springframework.context.annotation.Bean; import org.springframework.context.annotation.Configuration; import java.util.HashMap; import java.util.Map; @Configuration public class MQConfig { public static final String QUEUE = &amp;quot;queue&amp;quot;; public static final String TOPIC_QUEUE1 = &amp;quot;topic.queue.1&amp;quot;; public static final String TOPIC_QUEUE2 = &amp;quot;topic.queue.2&amp;quot;; public static final String FANOUT_QUEUE1 = &amp;quot;fanout.queue.1&amp;quot;; public static final String FANOUT_QUEUE2 = &amp;quot;fanout.</description>
+    </item>
+    
+  </channel>
+</rss>

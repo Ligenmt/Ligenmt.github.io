@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>go广度优先求解迷宫</title>
+  <link href="https://ligenmt.github.io//css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="https://ligenmt.github.io//css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css">
+  <style type="text/css">
+  
+    footer.page-footer{background-image: url(https://ligenmt.github.io//images/default.png);}
+  
+  </style>
+</head>
+<body>
+  <ul id="slide-out" class="side-nav">
+    <li><a href="https://ligenmt.github.io/"><i class="mdi-action-home left"></i>Home<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+    <li><a href="https://ligenmt.github.io//categories"><i class="mdi-action-perm-media left"></i>Categories<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+    <li><a href="https://ligenmt.github.io//tags"><i class="mdi-action-loyalty left"></i>Tags<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+  </ul>
+  <div id="index-banner" class="parallax-container">
+  <a data-activates="slide-out" class="btn-floating button-collapse" style="top: 5px; left: 5px;"><i class="mdi-navigation-menu"></i></a>
+    <div class="section no-pad-bot">
+      <div class="container">
+        
+        <h1 class="header center teal-text text-lighten-2">Ligen的笔记</h1>
+        <div class="row center">
+          <h5 class="header col s12 light">一个小开发仔的笔记</h5>
+        </div>
+        <div class="row center">
+        
+        
+          <a href="https://github.com/ligenmt"><img src="https://ligenmt.github.io//images/github2-dreamstale35.png"></a>
+        
+        
+        
+        
+        
+          <a href="https://ligenmt.github.io//index.xml"><img src="https://ligenmt.github.io//images/feed-dreamstale27.png"></a>
+        </div>
+      </div>
+    </div>
+    <div class="parallax">
+    
+      <img src="https://ligenmt.github.io//images/default.png">
+    
+    </div>
+  </div>
+
+
+
+<div class="container">
+  <div class="section">
+
+    <div class="row">
+      <div class="col s12">
+        <div class="card-panel">
+          <h4>go广度优先求解迷宫</h4>
+          <p>
+          
+            
+              <a href="https://ligenmt.github.io//categories/%E7%BC%96%E7%A8%8B%E5%BF%83%E6%B3%95/">编程心法</a>
+            
+           
+          </p>
+          <p><p>正在学习慕课网go语言视频，实现了一个广度优先的迷宫走法搜索。</p>
+
+<p>迷宫文件maze.in:</p>
+
+<p>其中第一行表示迷宫的行列数，1表示障碍，0表示可走。</p>
+
+<pre><code>6 5
+0 1 0 0 0
+0 0 0 1 0
+0 1 0 1 0
+1 1 1 0 0
+0 1 0 0 1
+0 1 0 0 0
+</code></pre>
+
+<p>以下是实现：</p>
+
+<pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;os&quot;
+)
+/**
+广度优先走迷宫
+ */
+func main() {
+	maze := readMaze(&quot;maze/maze.in&quot;)
+	for _, row := range maze {
+		for _, val := range row {
+			fmt.Printf(&quot;%d &quot;, val)
+		}
+		fmt.Println()
+	}
+	w := walk(maze, Point{0, 0}, Point{5, 4})
+	for _, row := range w {
+		for _, val := range row {
+			fmt.Printf(&quot;%3d &quot;, val)
+		}
+		fmt.Println()
+	}
+}
+
+type Point struct {
+	i, j int
+}
+//移动点
+func (p Point) add(a Point) Point {
+	return Point{p.i + a.i, p.j + a.j}
+}
+
+//上左下右
+var dirs = [4]Point{{i:-1, j:0}, {0,-1}, {1,0}, {0,1}}
+
+func walk(maze [][]int, start Point,end Point) [][]int {
+	//初始化step
+	steps := make([][]int, len(maze))
+	for i := range steps {
+		steps[i] = make([]int, len(maze[0]))
+	}
+	//初始化q
+	q := []Point{start}
+
+	for len(q) &gt; 0 {
+		curPoint := q[0] //当前点
+		q = q[1:]
+		if curPoint.i == end.i &amp;&amp; curPoint.j == end.j {
+			break
+		}
+		for _, p := range dirs {
+			nextPoint := curPoint.add(p)
+			//超出边界
+			if nextPoint.i &lt; 0 || nextPoint.i &gt;= len(maze) || nextPoint.j &lt; 0 || nextPoint.j &gt;= len(maze[0]) {
+				continue
+			}
+			//当前位置不可走
+			//fmt.Printf(&quot;test %d %d&quot;, nextPoint.i, nextPoint.j)
+			if maze[nextPoint.i][nextPoint.j] == 1 {
+				continue
+			}
+			//之前已经来过了
+			if steps[nextPoint.i][nextPoint.j] &gt; 0{
+				continue
+			}
+			//就是起始点
+			if nextPoint.i == start.i &amp;&amp; nextPoint.j == start.j {
+				continue
+			}
+			steps[nextPoint.i][nextPoint.j] = steps[curPoint.i][curPoint.j] + 1
+			fmt.Printf(&quot;Point %d %d is step %d\n&quot;, nextPoint.i, nextPoint.j, steps[nextPoint.i][nextPoint.j])
+			q = append(q, Point{nextPoint.i, nextPoint.j})
+		}
+	}
+	return steps
+}
+
+func readMaze(filename string) [][]int {
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	var row, col int
+	fmt.Fscanf(file, &quot;%d %d&quot;, &amp;row, &amp;col)
+	//fmt.Fscanf(file, &quot;%d&quot;)
+	maze := make([][]int, row)
+	for i := range maze {
+		maze[i] = make([]int, col)
+		for j := range maze[i] {
+			fmt.Fscanf(file, &quot;%d&quot;, &amp;maze[i][j])
+		}
+	
+	}
+	return maze
+}
+</code></pre>
+</p>
+          <p>20 Aug 2018
+            
+              
+                <a href="https://ligenmt.github.io//tags/go/">#go</a>
+              
+            
+          </p>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col s3 m1">
+      
+        <a class="btn-floating btn-large waves-effect waves-light" href="https://ligenmt.github.io/post/python%E6%93%8D%E4%BD%9Cexcel/"><i class="mdi-navigation-arrow-back"></i></a>
+      
+      </div>
+      <div class="col s6 m10 center">&nbsp</div>
+      <div class="col s3 m1">
+      
+        <a class="btn-floating btn-large waves-effect waves-light" href="https://ligenmt.github.io/post/springboot%E4%B8%ADrabbitmq%E5%9B%9B%E7%A7%8D%E4%BA%A4%E6%8D%A2%E6%9C%BA%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F/"><i class="mdi-navigation-arrow-forward"></i></a>
+      
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  <footer class="page-footer">
+    <div class="footer-copyright">
+      <div class="container">
+      © 2015 Copyright Text
+      <div class="right">Design <a class="grey-text text-lighten-4" href="http://pdevty.github.io/blog/">pdevty</a></div>
+      </div>
+    </div>
+  </footer>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://ligenmt.github.io//js/materialize.min.js"></script>
+  <script src="https://ligenmt.github.io//js/init.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  </body>
+</html>
+

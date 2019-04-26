@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>Python操作Excel</title>
+  <link href="https://ligenmt.github.io//css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="https://ligenmt.github.io//css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css">
+  <style type="text/css">
+  
+    footer.page-footer{background-image: url(https://ligenmt.github.io//images/default.png);}
+  
+  </style>
+</head>
+<body>
+  <ul id="slide-out" class="side-nav">
+    <li><a href="https://ligenmt.github.io/"><i class="mdi-action-home left"></i>Home<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+    <li><a href="https://ligenmt.github.io//categories"><i class="mdi-action-perm-media left"></i>Categories<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+    <li><a href="https://ligenmt.github.io//tags"><i class="mdi-action-loyalty left"></i>Tags<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+  </ul>
+  <div id="index-banner" class="parallax-container">
+  <a data-activates="slide-out" class="btn-floating button-collapse" style="top: 5px; left: 5px;"><i class="mdi-navigation-menu"></i></a>
+    <div class="section no-pad-bot">
+      <div class="container">
+        
+        <h1 class="header center teal-text text-lighten-2">Ligen的笔记</h1>
+        <div class="row center">
+          <h5 class="header col s12 light">一个小开发仔的笔记</h5>
+        </div>
+        <div class="row center">
+        
+        
+          <a href="https://github.com/ligenmt"><img src="https://ligenmt.github.io//images/github2-dreamstale35.png"></a>
+        
+        
+        
+        
+        
+          <a href="https://ligenmt.github.io//index.xml"><img src="https://ligenmt.github.io//images/feed-dreamstale27.png"></a>
+        </div>
+      </div>
+    </div>
+    <div class="parallax">
+    
+      <img src="https://ligenmt.github.io//images/default.png">
+    
+    </div>
+  </div>
+
+
+
+<div class="container">
+  <div class="section">
+
+    <div class="row">
+      <div class="col s12">
+        <div class="card-panel">
+          <h4>Python操作Excel</h4>
+          <p>
+          
+            
+              <a href="https://ligenmt.github.io//categories/%E6%A8%A1%E6%9D%BF%E4%BB%A3%E7%A0%81/">模板代码</a>
+            
+           
+          </p>
+          <p><pre><code class="language-python">import xlrd
+from xlutils.copy import copy
+import pymongo
+ 
+ 
+connect_url = 'mongodb://entry.ligen.net:20001/datacenter?authMechanism=SCRAM-SHA-1'
+client = pymongo.MongoClient(connect_url).datacenter.initdata
+rexcel = xlrd.open_workbook('E:\\数据.xlsx')
+excel = copy(rexcel)
+ 
+table = rexcel.sheets()[1]
+ctable = excel.get_sheet(1)
+ 
+nrows = table.nrows
+ 
+for i in range(nrows):
+    print(i, table.row_values(i))
+    if i == 0 or i == 1:
+        continue
+    row = table.row_values(i)
+    customerId = str(int(row[1]))
+ 
+    user = client.find_one({'_id': customerId})
+    if not user:
+        continue
+    try:
+        jingdong = user['customer']['jingdongUP']
+        email = user['customer']['email']
+        if jingdong:
+            ctable.write(i, 6, jingdong)
+        if email:
+            ctable.write(i, 3, email)
+    except:
+        pass
+ 
+excel.save(&quot;E:\\collection.xls&quot;)
+</code></pre>
+</p>
+          <p>25 Oct 2015
+            
+              
+                <a href="https://ligenmt.github.io//tags/python/">#python</a>
+              
+            
+          </p>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col s3 m1">
+      
+        <a class="btn-floating btn-large disabled"><i class="mdi-navigation-arrow-back"></i></a>
+      
+      </div>
+      <div class="col s6 m10 center">&nbsp</div>
+      <div class="col s3 m1">
+      
+        <a class="btn-floating btn-large waves-effect waves-light" href="https://ligenmt.github.io/post/go%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%B1%82%E8%A7%A3%E8%BF%B7%E5%AE%AB/"><i class="mdi-navigation-arrow-forward"></i></a>
+      
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  <footer class="page-footer">
+    <div class="footer-copyright">
+      <div class="container">
+      © 2015 Copyright Text
+      <div class="right">Design <a class="grey-text text-lighten-4" href="http://pdevty.github.io/blog/">pdevty</a></div>
+      </div>
+    </div>
+  </footer>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://ligenmt.github.io//js/materialize.min.js"></script>
+  <script src="https://ligenmt.github.io//js/init.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  </body>
+</html>
+
