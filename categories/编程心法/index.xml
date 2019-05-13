@@ -7,10 +7,28 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© 2015 Copyright Text</copyright>
-    <lastBuildDate>Sat, 27 Apr 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 13 May 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://ligenmt.github.io/categories/%E7%BC%96%E7%A8%8B%E5%BF%83%E6%B3%95/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>手写极简版mybatis</title>
+      <link>https://ligenmt.github.io/post/%E6%89%8B%E5%86%99%E6%9E%81%E7%AE%80%E7%89%88mybatis/</link>
+      <pubDate>Mon, 13 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ligenmt.github.io/post/%E6%89%8B%E5%86%99%E6%9E%81%E7%AE%80%E7%89%88mybatis/</guid>
+      <description>一直以来都在使用mybatis来操作mysql数据库，也对它的技术原理很好奇，例如：它的配置文件是以什么方式读取的？我们使用的自动注入的Mapper是怎么实现的？
+最近将mybatis的源码学习了一下，实现了一个简易版本的mybatis，用于方便理解它的运行原理。简单起见，我们只实现了利用jdbc连接mysql，读取mappers配置文件，利用动态代理mapper接口来操作数据库。
+自己画了个mybatis执行的大致流程图，之后的实现基本上基于这个图来做。
+mybatis的核心当然是那一堆熟悉的xml格式配置文件。这是一个配置文件的简单样例，看下它的内容：
+&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt; &amp;lt;!DOCTYPE mapper PUBLIC &amp;quot;-//mybatis.org//DTD Mapper 3.0//EN&amp;quot; &amp;quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&amp;quot;&amp;gt; &amp;lt;mapper namespace=&amp;quot;com.ligen.javalab.mybatis.mapper.PUserMapper&amp;quot;&amp;gt; &amp;lt;select id=&amp;quot;selectByPrimaryKey&amp;quot; resultType=&amp;quot;com.ligen.javalab.mybatis.entity.PUser&amp;quot;&amp;gt; select * from product_1_user where id = ? &amp;lt;/select&amp;gt; &amp;lt;select id=&amp;quot;selectAll&amp;quot; resultType=&amp;quot;com.ligen.javalab.mybatis.entity.PUser&amp;quot;&amp;gt; select * from product_1_user &amp;lt;/select&amp;gt; &amp;lt;/mapper&amp;gt;  PUser是用于测试随便建的一个表的模型映射：
+public class PUser { Long id; Long user_id; //省略get set }  就俩字段，一个主键一个userid。sql就是一个简单的根据主键查询。
+对应的mapper接口也就出来了：
+public interface PUserMapper { PUser selectByPrimaryKey(Long id); List&amp;lt;PUser&amp;gt; selectAll(); }  mapper标签带有一个namespace属性，里面有两个select标签，有id和resultType两个属性，标签内容为具体的sql语句。我们需要将每一条sql语句都解析好保存到一个容器（一个map就行）中，以便之后使用。
+可以为每个sql抽象出一个实体类：
+public class MapperStatement { String namespace; //对应mapper中的namespace String id; //对应select中的id String resultType; //对应select中的resultType String sql; //对应具体的sql //省略get set }  根据上图，首先我们需要一个Configuration类，用于存放连接数据库的相关信息和解析mappers配置。</description>
+    </item>
     
     <item>
       <title>SpringCloud-Zuul源码分析和路由改造</title>
