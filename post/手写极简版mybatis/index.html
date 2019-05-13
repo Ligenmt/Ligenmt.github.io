@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>手写极简版mybatis</title>
+  <link href="https://ligenmt.github.io//css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="https://ligenmt.github.io//css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css">
+  <style type="text/css">
+  
+    footer.page-footer{background-image: url(https://ligenmt.github.io//images/default.png);}
+  
+  </style>
+</head>
+<body>
+  <ul id="slide-out" class="side-nav">
+    <li><a href="https://ligenmt.github.io/"><i class="mdi-action-home left"></i>Home<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+    <li><a href="https://ligenmt.github.io//categories"><i class="mdi-action-perm-media left"></i>Categories<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+    <li><a href="https://ligenmt.github.io//tags"><i class="mdi-action-loyalty left"></i>Tags<i class="mdi-hardware-keyboard-arrow-right right"></i></a></li>
+  </ul>
+  <div id="index-banner" class="parallax-container">
+  <a data-activates="slide-out" class="btn-floating button-collapse" style="top: 5px; left: 5px;"><i class="mdi-navigation-menu"></i></a>
+    <div class="section no-pad-bot">
+      <div class="container">
+        
+        <h1 class="header center teal-text text-lighten-2">Ligen的笔记</h1>
+        <div class="row center">
+          <h5 class="header col s12 light">一个小开发仔的笔记</h5>
+        </div>
+        <div class="row center">
+        
+        
+          <a href="https://github.com/ligenmt"><img src="https://ligenmt.github.io//images/github2-dreamstale35.png"></a>
+        
+        
+        
+        
+        
+          <a href="https://ligenmt.github.io//index.xml"><img src="https://ligenmt.github.io//images/feed-dreamstale27.png"></a>
+        </div>
+      </div>
+    </div>
+    <div class="parallax">
+    
+      <img src="https://ligenmt.github.io//images/default.png">
+    
+    </div>
+  </div>
+
+
+
+<div class="container">
+  <div class="section">
+
+    <div class="row">
+      <div class="col s12">
+        <div class="card-panel">
+          <h4>手写极简版mybatis</h4>
+          <p>
+          
+            
+              <a href="https://ligenmt.github.io//categories/%E7%BC%96%E7%A8%8B%E5%BF%83%E6%B3%95/">编程心法</a>
+            
+           
+          </p>
+          <p><p>一直以来都在使用mybatis来操作mysql数据库，也对它的技术原理很好奇，例如：它的配置文件是以什么方式读取的？我们使用的自动注入的Mapper是怎么实现的？</p>
+
+<p>最近将mybatis的源码学习了一下，实现了一个简易版本的mybatis，用于方便理解它的运行原理。简单起见，我们只实现了利用jdbc连接mysql，读取mappers配置文件，利用动态代理mapper接口来操作数据库。</p>
+
+<p>自己画了个mybatis执行的大致流程图，之后的实现基本上基于这个图来做。</p>
+
+<p><img src="/static/手写极简版mybatis/mybatis-1.png" alt="mybatis-1.png" title="1" /></p>
+
+<p>mybatis的核心当然是那一堆熟悉的xml格式配置文件。这是一个配置文件的简单样例，看下它的内容：</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+        PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.ligen.javalab.mybatis.mapper.PUserMapper&quot;&gt;
+    &lt;select id=&quot;selectByPrimaryKey&quot; resultType=&quot;com.ligen.javalab.mybatis.entity.PUser&quot;&gt;
+        select * from product_1_user where id = ?
+    &lt;/select&gt;
+    &lt;select id=&quot;selectAll&quot; resultType=&quot;com.ligen.javalab.mybatis.entity.PUser&quot;&gt;
+        select * from product_1_user
+    &lt;/select&gt;
+&lt;/mapper&gt; 
+</code></pre>
+
+<p>PUser是用于测试随便建的一个表的模型映射：</p>
+
+<pre><code class="language-java">public class PUser {
+    Long id;
+    Long user_id;
+    //省略get set
+}
+</code></pre>
+
+<p>就俩字段，一个主键一个userid。sql就是一个简单的根据主键查询。</p>
+
+<p>对应的mapper接口也就出来了：</p>
+
+<pre><code class="language-java">public interface PUserMapper {
+
+    PUser selectByPrimaryKey(Long id);
+
+    List&lt;PUser&gt; selectAll();
+}
+</code></pre>
+
+<p>mapper标签带有一个namespace属性，里面有两个select标签，有id和resultType两个属性，标签内容为具体的sql语句。我们需要将每一条sql语句都解析好保存到一个容器（一个map就行）中，以便之后使用。</p>
+
+<p>可以为每个sql抽象出一个实体类：</p>
+
+<pre><code class="language-java">public class MapperStatement {
+
+    String namespace;  //对应mapper中的namespace
+    String id;                  //对应select中的id
+    String resultType;    //对应select中的resultType
+    String sql; 		    //对应具体的sql
+
+    //省略get set
+}
+</code></pre>
+
+<p>根据上图，首先我们需要一个Configuration类，用于存放连接数据库的相关信息和解析mappers配置。</p>
+
+<p>抽象出的实体类：</p>
+
+<pre><code class="language-java">public class Configuration {
+
+    private String jdbcDriver;
+    private String jdbcUrl;
+    private String jdbcUsername;
+    private String jdbcPassword;
+
+    Map&lt;String, MapperStatement&gt; statementMap = new HashMap&lt;&gt;();
+}
+</code></pre>
+
+<p>然后我们需要一个SqlSessionFactory类，用于解析数据库连接信息和mappers配置的sql，并保存到Configuration中。</p>
+
+<pre><code class="language-java">public class SqlSessionFactory {
+
+    private final Configuration configuration = new Configuration();
+
+    private static final String MAPPER_CONFIG_LOCATION = &quot;mappers&quot;;
+    private static final String DB_CONFIG_LOCATION = &quot;db.properties&quot;;
+
+    public SqlSessionFactory() {
+        loadDb();
+        loadMappers();
+    }
+
+    private void loadDb() {
+	//假设数据库配置位于db.properties中
+        InputStream dbin = SqlSessionFactory.class.getClassLoader().getResourceAsStream(DB_CONFIG_LOCATION);
+        Properties p = new Properties();
+        try {
+            p.load(dbin);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        configuration.setJdbcDriver(p.getProperty(&quot;jdbc.driver&quot;));
+        configuration.setJdbcUrl(p.getProperty(&quot;jdbc.url&quot;));
+        configuration.setJdbcUsername(p.getProperty(&quot;jdbc.username&quot;));
+        configuration.setJdbcPassword(p.getProperty(&quot;jdbc.password&quot;));
+
+    }
+    private void loadMappers() {
+        URL resource = null;
+	//假设mapper配置文件位于mappers文件夹中
+        resource = SqlSessionFactory.class.getClassLoader().getResource(MAPPER_CONFIG_LOCATION);
+        File mappers = new File(resource.getFile());
+        if (mappers.isDirectory()) {
+            File[] files = mappers.listFiles();
+            for (File f : files) {
+                loadMapper(f);
+            }
+        }
+    }
+
+    private void loadMapper(File f) {
+        SAXReader saxReader = new SAXReader();
+        Document document = null;
+        try {
+            document = saxReader.read(f);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        //获得根节点元素对象
+        Element root = document.getRootElement();
+        String namespace = root.attribute(&quot;namespace&quot;).getData().toString();
+        //获取select子节点
+        List&lt;Element&gt; selects = root.elements(&quot;select&quot;);
+        for (Element element : selects) {
+            MapperStatement ms = new MapperStatement();
+            String id = element.attribute(&quot;id&quot;).getData().toString();
+     //每一条sql的唯一标识
+            String sourceId = namespace + &quot;.&quot; + id;
+            ms.setNamespace(namespace);
+            ms.setId(id);
+            ms.setResultType(element.attribute(&quot;resultType&quot;).getData().toString());
+            ms.setSql(element.getData().toString());
+     //保存在一个map中，之后可根据sourceId获取
+            configuration.getStatementMap().put(sourceId, ms);
+        }
+    }
+    //生成SqlSession
+    public SqlSession openSession() {
+            return new DefaultSqlSession(configuration);
+    }
+
+}
+</code></pre>
+
+<p>注意最下方的openSession，调用它来新建一个SqlSession。SqlSession负责提供代理的Mapper类，并将查询方法转发给Executor。</p>
+
+<p>SqlSession接口：</p>
+
+<pre><code class="language-java">public interface SqlSession {
+
+    &lt;T&gt; T selectOne(String statement, Object parameter);
+
+    &lt;E&gt;List&lt;E&gt; selectList(String statement,Object parameter);
+
+    &lt;T&gt; T getMapper(Class&lt;T&gt; type);
+}
+</code></pre>
+
+<p>SqlSession的实现：</p>
+
+<pre><code class="language-java">public class DefaultSqlSession implements SqlSession {
+
+    private Configuration conf;
+
+    private Executor executor;
+
+    public DefaultSqlSession(Configuration conf) {
+        this.conf = conf;
+        //所有的sql底层操作封装在Executor中
+        executor = new DefaultExecutor(conf);
+    }
+
+    @Override
+    public &lt;T&gt; T selectOne(String statement, Object parameter) {
+        List&lt;Object&gt; selectList = this.selectList(statement, parameter);
+        if (selectList == null || selectList.size() == 0) {
+            return null;
+        }
+        if (selectList.size() == 1) {
+            return (T) selectList.get(0);
+        } else {
+            throw new RuntimeException(&quot;Too many results!&quot;);
+        }
+    }
+
+    @Override
+    public &lt;E&gt; List&lt;E&gt; selectList(String statement, Object parameter) {
+		//根据调用的方法+接口名称去Configuration中寻找对应的sql配置
+        MapperStatement mapperStatement = conf.getStatementMap().get(statement);
+        return executor.query(mapperStatement, parameter);
+    }
+	
+	//获取指定接口的代理
+    @Override
+    public &lt;T&gt; T getMapper(Class&lt;T&gt; type) {
+        MapperProxy mp = new MapperProxy(this);
+        return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, mp);
+    }
+}
+</code></pre>
+
+<p>看一下getMapper方法，它传入的就是我们平时用到的Mapper接口，返回该接口的代理实现类。
+调用方在调用Mapper接口的各种方法时，实际上都统一调用到MapperProxy的invoke中来，这里再根据调用方法接口的类名啊方法名啊去之前Configuration中的找对应的MapperStatement。</p>
+
+<pre><code class="language-java">public class MapperProxy implements InvocationHandler {
+
+    private SqlSession sqlSession;
+
+    public MapperProxy(SqlSession sqlSession) {
+        this.sqlSession = sqlSession;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+        Class&lt;?&gt; returnType = method.getReturnType();
+		//将唯一标识传给sqlSession
+        String statement = method.getDeclaringClass().getName() + &quot;.&quot; + method.getName();
+        List argList = new ArrayList();
+        if (args != null) {
+            argList = Arrays.asList(args);
+        }
+		//只是判断一下返回单个还是数组
+        if (Collection.class.isAssignableFrom(returnType)) {
+            return sqlSession.selectList(statement, argList);
+        } else {
+            return sqlSession.selectOne(statement, argList);
+        }
+    }
+}
+</code></pre>
+
+<p>SqlSession中的SelectList方法（SelectOne最终也是调用Select）：</p>
+
+<pre><code class="language-java">public &lt;E&gt; List&lt;E&gt; selectList(String statement, Object parameter) {
+	MapperStatement mapperStatement = conf.getStatementMap().get(statement);
+	return executor.query(mapperStatement, parameter);
+}
+</code></pre>
+
+<p>Executor接口：</p>
+
+<pre><code class="language-java">public interface Executor {
+    &lt;E&gt; List&lt;E&gt; query(MapperStatement ms, Object parameter);
+}
+</code></pre>
+
+<p>Executor实现类，主要就是一些原生sql操作代码了：</p>
+
+<pre><code class="language-java">public class DefaultExecutor implements Executor {
+
+    private final Configuration conf;
+
+    public DefaultExecutor(Configuration conf) {
+        this.conf = conf;
+    }
+
+    @Override
+    public &lt;E&gt; List&lt;E&gt; query(MapperStatement ms, Object parameter) {
+        List&lt;E&gt; resultList = new ArrayList&lt;&gt;();
+        try {
+            Class.forName(conf.getJdbcDriver());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Connection conn = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            conn = DriverManager.getConnection(conf.getJdbcUrl(), conf.getJdbcUsername(), conf.getJdbcPassword());
+            preparedStatement = conn.prepareStatement(ms.getSql());
+            //将方法参数映射到占位符上
+            parameterize(preparedStatement, parameter);
+            //jdbc执行sql
+            resultSet = preparedStatement.executeQuery();
+            //将结果反射到list中
+            handleResultSet(resultSet, resultList, ms.getResultType());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                resultSet.close();
+                preparedStatement.close();
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return resultList;
+    }
+
+    private void parameterize(PreparedStatement preparedStatement, Object parameter) throws SQLException {
+
+        if (Collection.class.isAssignableFrom(parameter.getClass())) {
+            Object[] objects = ((Collection) parameter).toArray();
+            for (int i=0; i&lt;objects.length; i++) {
+                Object p = objects[i];
+                if (p instanceof Integer) {
+                    preparedStatement.setInt(i+1, (Integer) p);
+                } else if (p instanceof String) {
+                    preparedStatement.setString(i+1, (String) p);
+                } else if (p instanceof Long) {
+                    preparedStatement.setLong(i+1, (Long) p);
+                }
+            }
+        }
+    }
+
+    //读取ResultSet中数据，填充到model中
+    private &lt;E&gt; void handleResultSet(ResultSet resultSet, List&lt;E&gt; ret, String resultType) {
+        Class&lt;E&gt; clazz = null;
+        try {
+            clazz = (Class&lt;E&gt;) Class.forName(resultType);
+            while (resultSet.next()) {
+                Object entity = clazz.newInstance();
+                ReflectionUtil.setPropToBeanFromResultSet(entity, resultSet);
+                ret.add((E) entity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+
+<p>Executors中用到的反射工具类：</p>
+
+<pre><code class="language-java">public class ReflectionUtil {
+
+    public static void setPropToBean(Object bean, String propName, Object value) {
+
+        try {
+            Field field = bean.getClass().getDeclaredField(propName);
+            field.setAccessible(true);
+            field.set(bean, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setPropToBeanFromResultSet(Object bean, ResultSet resultSet) throws SQLException {
+        Field[] fields = bean.getClass().getDeclaredFields();
+ //简单起见，只处理了几种基本类型
+        for (Field f : fields) {
+            if (f.getType().getSimpleName().equals(&quot;String&quot;)) {
+                setPropToBean(bean, f.getName(), resultSet.getString(f.getName()));
+            } else if (f.getType().getSimpleName().equals(&quot;Integer&quot;)) {
+                setPropToBean(bean, f.getName(), resultSet.getInt(f.getName()));
+            } else if (f.getType().getSimpleName().equals(&quot;Long&quot;)) {
+                setPropToBean(bean, f.getName(), resultSet.getLong(f.getName()));
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>好了！下面起个main方法来测试一下：
+public class TestMybatis {</p>
+
+<pre><code>public static void main(String[] args) {
+    //创建SqlSessionFactory
+    SqlSessionFactory sqlSessionFactory = new SqlSessionFactory();
+    //创建SqlSession
+    SqlSession sqlSession = sqlSessionFactory.openSession();
+    //获取动态代理后接口
+    PUserMapper mapper = sqlSession.getMapper(PUserMapper.class);
+    //执行指定sql
+    PUser pUser = mapper.selectByPrimaryKey(1L);
+    System.out.println(pUser);
+}
+</code></pre>
+
+<p>}</p>
+
+<p>打印PUser(id=1, user_id=1)，说明查询成功了！
+总结整个流程如下：</p>
+
+<ol>
+<li>创建SqlSessionFactory对象，过程中加载配置文件创建Configuration对象；</li>
+<li>通过SqlSessionFactory创建SqlSession对象；</li>
+<li>通过SqlSession对象创建Executor对象；</li>
+<li>通过SqlSession获取mapper接口动态代理；</li>
+<li>动态代理方法回调SqlSession中的查询方法；</li>
+<li>SqlSession中查询方法调用Executor中查询方法；</li>
+<li>Executor基于jdbc访问数据库；</li>
+<li>Executor将查询结果映射成Entity类返回，并由SqlSession返回给调用方。</li>
+</ol>
+</p>
+          <p>13 May 2019
+            
+              
+                <a href="https://ligenmt.github.io//tags/java/">#java</a>
+              
+            
+          </p>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col s3 m1">
+      
+        <a class="btn-floating btn-large waves-effect waves-light" href="https://ligenmt.github.io/post/springcloud-zuul%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%92%8C%E8%B7%AF%E7%94%B1%E6%94%B9%E9%80%A0/"><i class="mdi-navigation-arrow-back"></i></a>
+      
+      </div>
+      <div class="col s6 m10 center">&nbsp</div>
+      <div class="col s3 m1">
+      
+        <a class="btn-floating btn-large disabled"><i class="mdi-navigation-arrow-forward"></i></a>
+      
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  <footer class="page-footer">
+    <div class="footer-copyright">
+      <div class="container">
+      © 2015 Copyright Text
+      <div class="right">Design <a class="grey-text text-lighten-4" href="http://pdevty.github.io/blog/">pdevty</a></div>
+      </div>
+    </div>
+  </footer>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://ligenmt.github.io//js/materialize.min.js"></script>
+  <script src="https://ligenmt.github.io//js/init.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  </body>
+</html>
+
