@@ -142,12 +142,20 @@
 
 <p>然后我们需要一个SqlSessionFactory类，用于解析数据库连接信息和mappers配置的sql，并保存到Configuration中。</p>
 
+<p>数据库配置application.properties:</p>
+
+<pre><code>jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://localhost:3306/javalab?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true&amp;generateSimpleParameterMetadata=true
+jdbc.username=root
+jdbc.password=root
+</code></pre>
+
 <pre><code class="language-java">public class SqlSessionFactory {
 
     private final Configuration configuration = new Configuration();
 
     private static final String MAPPER_CONFIG_LOCATION = &quot;mappers&quot;;
-    private static final String DB_CONFIG_LOCATION = &quot;db.properties&quot;;
+    private static final String DB_CONFIG_LOCATION = &quot;application.properties&quot;;
 
     public SqlSessionFactory() {
         loadDb();
